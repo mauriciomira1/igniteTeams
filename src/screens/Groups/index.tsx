@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { useState } from "react";
-import { FlatList } from "react-native";
+import { Alert, FlatList } from "react-native";
 
 import { Container } from "./styles";
 
@@ -12,16 +12,21 @@ import { ListEmpty } from "@components/ListEmpty";
 
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { groupsGetAll } from "@storage/group/groupsGetAll";
+import Loading from "@components/Loading";
 
 export default function Groups() {
+  const [isLoading, setIsLoading] = useState(true);
   const [groups, setGroups] = useState<string[]>([]);
 
   const fetchGroups = async () => {
     try {
+      setIsLoading(true);
       const data = await groupsGetAll();
       setGroups(data);
     } catch (error) {
-      throw error;
+      Alert.alert("Grupos", "Não foi possível carregar os grupos");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,22 +48,26 @@ export default function Groups() {
 
   return (
     <Container>
-      <Header showBackButton />
+      <Header />
 
-      <Highlight title="Turmas" subtitle="Jogue com sua turma" />
+      <Highlight title="Grupos" subtitle="Jogue com sua turma" />
 
-      <FlatList
-        data={groups}
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => (
-          <GroupCard title={item} onPress={() => handleOpenGroup(item)} />
-        )}
-        contentContainerStyle={groups.length === 0 && { flex: 1 }}
-        ListEmptyComponent={() => (
-          <ListEmpty message="Que tal cadastrar a primeira turma?" />
-        )}
-      />
-      <Button title="Criar nova turma" onPress={handleNewGroup} />
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <FlatList
+          data={groups}
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => (
+            <GroupCard title={item} onPress={() => handleOpenGroup(item)} />
+          )}
+          contentContainerStyle={groups.length === 0 && { flex: 1 }}
+          ListEmptyComponent={() => (
+            <ListEmpty message="Que tal cadastrar o primeiro grupo?" />
+          )}
+        />
+      )}
+      <Button title="Criar novo grupo" onPress={handleNewGroup} />
     </Container>
   );
 }

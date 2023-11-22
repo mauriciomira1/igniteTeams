@@ -7,8 +7,9 @@ export const playersGetByGroup = async (group: string) => {
     const storage = await AsyncStorage.getItem(`${PLAYER_COLLECTION}-${group}`);
 
     const players: PlayerStorageDTO[] = storage ? JSON.parse(storage) : [];
+
     return players;
   } catch (error) {
-    throw error;
+    console.log("Erro no playersGetByGroup ===>", error);
   }
 };

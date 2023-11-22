@@ -11,14 +11,15 @@ export const PlayerAddByGroup = async (
 ) => {
   try {
     const storagePlayers = await playersGetByGroup(group);
-    const verifyPlayers = storagePlayers.filter(
+
+    const verifyPlayers = storagePlayers!.filter(
       (player) => player.name === newPlayer.name
     );
     if (verifyPlayers.length > 0) {
-      throw new AppError("Jogador já adicionado a turma");
+      throw new AppError("Esse jogador já está na turma");
     }
 
-    const storage = JSON.stringify([...storagePlayers, newPlayer]);
+    const storage = JSON.stringify([...storagePlayers!, newPlayer]);
 
     await AsyncStorage.setItem(`${PLAYER_COLLECTION}-${group}`, storage);
   } catch (error) {
